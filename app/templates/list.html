@@ -1,1 +1,235 @@
-{% extends "base.html" %}{% block body %}<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3"><h1>{{label}}</h1><a class="btn btn-success" href="{{url_for('new',kind=kind)}}">➕ إضافة</a></div><form class="row g-2 mb-3"><div class="col"><input name="q" class="form-control" placeholder="بحث..." value="{{request.args.get('q','')}}"></div><div class="col-auto"><button class="btn btn-secondary">بحث</button></div></form><div class="table-responsive bg-white rounded shadow-sm"><table class="table table-hover align-middle mb-0"><thead><tr>{% for c in cols %}<th>{{c}}</th>{% endfor %}<th>إجراء</th></tr></thead><tbody>{% for r in rows %}<tr>{% for c in cols %}<td>{{getattr(r,c,"")}}</td>{% endfor %}<td>{% if kind=="facilities" %}<a class="btn btn-sm btn-primary" href="{{url_for('facility',fid=r.id)}}">📂 الملف</a>{% endif %}<a class="btn btn-sm btn-outline-primary" href="{{url_for('edit',kind=kind,rid=r.id)}}">✏️</a><form class="d-inline" method="post" action="{{url_for('delete',kind=kind,rid=r.id)}}" onsubmit="return confirm('حذف السجل؟')"><button class="btn btn-sm btn-outline-danger">حذف</button></form></td></tr>{% else %}<tr><td colspan="{{cols|length+1}}" class="text-center p-5 text-muted">لا توجد بيانات</td></tr>{% endfor %}</tbody></table></div>{% endblock %}
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+
+    <div>
+        <h1 class="mb-1">
+            {{ label }}
+        </h1>
+
+        <small class="text-muted">
+            إدارة بيانات {{ label }}
+        </small>
+    </div>
+
+
+    {% if session.get('role') in ['admin', 'editor'] %}
+
+    <a
+        class="btn btn-success"
+        href="{{ url_for('new', kind=kind) }}"
+    >
+        ➕ إضافة {{ label }}
+    </a>
+
+    {% endif %}
+
+</div>
+
+
+<!-- البحث -->
+
+<form
+    method="get"
+    class="row g-2 mb-3"
+>
+
+    <div class="col">
+
+        <input
+            type="search"
+            name="q"
+            class="form-control"
+            placeholder="🔎 ابحث في {{ label }}..."
+            value="{{ request.args.get('q', '') }}"
+        >
+
+    </div>
+
+
+    <div class="col-auto">
+
+        <button
+            class="btn btn-secondary"
+            type="submit"
+        >
+            بحث
+        </button>
+
+    </div>
+
+
+    {% if request.args.get('q') %}
+
+    <div class="col-auto">
+
+        <a
+            href="{{ url_for('data_list', kind=kind) }}"
+            class="btn btn-outline-danger"
+        >
+            إلغاء البحث
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</form>
+
+
+<!-- الجدول -->
+
+<div class="table-responsive bg-white rounded shadow-sm">
+
+<table class="table table-hover align-middle mb-0">
+
+<thead>
+
+<tr>
+
+    <th>#</th>
+
+    {% for c in cols %}
+
+    <th>
+        {{ field_labels.get(c, c) }}
+    </th>
+
+    {% endfor %}
+
+    <th>
+        الإجراءات
+    </th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+{% for r in rows %}
+
+<tr>
+
+    <td>
+        {{ loop.index }}
+    </td>
+
+
+    {% for c in cols %}
+
+    <td>
+
+        {% if c == 'expiry' and getattr(r, c, None) %}
+
+            {{ getattr(r, c).strftime('%Y-%m-%d') }}
+
+        {% elif c == 'established_date' and getattr(r, c, None) %}
+
+            {{ getattr(r, c).strftime('%Y-%m-%d') }}
+
+        {% else %}
+
+            {{ getattr(r, c, '') or '-' }}
+
+        {% endif %}
+
+    </td>
+
+    {% endfor %}
+
+
+    <td>
+
+        <div class="d-flex gap-1 flex-wrap">
+
+
+            {% if kind == 'facilities' %}
+
+            <a
+                class="btn btn-sm btn-primary"
+                href="{{ url_for('facility', fid=r.id) }}"
+            >
+                📂 الملف
+            </a>
+
+            {% endif %}
+
+
+            {% if session.get('role') in ['admin', 'editor'] %}
+
+            <a
+                class="btn btn-sm btn-outline-primary"
+                href="{{ url_for('edit', kind=kind, rid=r.id) }}"
+            >
+                ✏️ تعديل
+            </a>
+
+            {% endif %}
+
+
+            {% if session.get('role') == 'admin' %}
+
+            <form
+                class="d-inline"
+                method="post"
+                action="{{ url_for('delete', kind=kind, rid=r.id) }}"
+                onsubmit="return confirm('هل أنت متأكد من حذف هذا السجل؟')"
+            >
+
+                <button
+                    type="submit"
+                    class="btn btn-sm btn-outline-danger"
+                >
+                    🗑️ حذف
+                </button>
+
+            </form>
+
+            {% endif %}
+
+
+        </div>
+
+    </td>
+
+</tr>
+
+
+{% else %}
+
+<tr>
+
+    <td
+        colspan="{{ cols|length + 2 }}"
+        class="text-center p-5 text-muted"
+    >
+
+        {% if request.args.get('q') %}
+
+            🔎 لا توجد نتائج للبحث عن:
+            <strong>{{ request.args.get('q') }}</strong>
+
+        {% else %}
+
+            لا توجد بيانات مسجلة حتى الآن.
+
+        {% endif %}
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+
+{% endblock %}
