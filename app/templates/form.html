@@ -43,22 +43,23 @@
                 required
             >
 
-                <option value="">
-                    -- اختر المرفق --
-                </option>
+             <option value="">
+    -- اختر المرفق --
+</option>
 
-                {% for f in facilities %}
+{% for f in facilities %}
 
-                <option
-                    value="{{ f.id }}"
-                    {% if obj and obj.facility_id == f.id %}
-                        selected
-                    {% endif %}
-                >
-                    {{ f.name }}
-                </option>
+<option
+    value="{{ f.id }}"
+    {% if (obj and obj.facility_id == f.id)
+          or (not obj and preselected_facility == f.id) %}
+        selected
+    {% endif %}
+>
+    {{ f.name }}
+</option>
 
-                {% endfor %}
+{% endfor %}
 
             </select>
 
