@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: libya-labs-system
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn "app:create_app()"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: libya-labs-db
+          property: connectionString
+databases:
+  - name: libya-labs-db
+    plan: free
