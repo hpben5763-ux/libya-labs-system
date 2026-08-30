@@ -1,1 +1,191 @@
-{% extends "base.html" %}{% block body %}<h1 class="mb-4">{{"تعديل" if obj else "إضافة"}} {{label}}</h1><form method="post" class="card shadow-sm p-4"><div class="row g-3">{% if kind!="facilities" %}<div class="col-md-6"><label class="form-label">المرفق</label><select name="facility_id" class="form-select" required>{% for f in facilities %}<option value="{{f.id}}" {% if obj and obj.facility_id==f.id %}selected{% endif %}>{{f.name}}</option>{% endfor %}</select></div>{% endif %}{% for c in cols %}{% if c=="expiry" %}<div class="col-md-6"><label class="form-label">{{c}}</label><input type="date" name="{{c}}" class="form-control" value="{{obj.expiry if obj and obj.expiry else ''}}"></div>{% else %}<div class="col-md-6"><label class="form-label">{{c}}</label><input name="{{c}}" class="form-control" value="{{getattr(obj,c,'') if obj else ''}}"></div>{% endif %}{% endfor %}</div><div class="mt-4 d-flex gap-2"><button class="btn btn-success">💾 حفظ</button><a class="btn btn-secondary" href="{{url_for('data_list',kind=kind)}}">إلغاء</a></div></form>{% endblock %}
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
+    <div>
+        <h1 class="mb-1">
+            {% if obj %}
+                ✏️ تعديل {{ label }}
+            {% else %}
+                ➕ إضافة {{ label }}
+            {% endif %}
+        </h1>
+
+        <p class="text-muted mb-0">
+            أدخل البيانات المطلوبة ثم اضغط حفظ.
+        </p>
+    </div>
+
+</div>
+
+
+<form method="post" class="card shadow-sm p-4">
+
+    <div class="row g-3">
+
+
+        <!-- اختيار المرفق -->
+
+        {% if kind != "facilities" %}
+
+        <div class="col-md-6">
+
+            <label class="form-label">
+                المرفق
+                <span class="text-danger">*</span>
+            </label>
+
+            <select
+                name="facility_id"
+                class="form-select"
+                required
+            >
+
+                <option value="">
+                    -- اختر المرفق --
+                </option>
+
+                {% for f in facilities %}
+
+                <option
+                    value="{{ f.id }}"
+                    {% if obj and obj.facility_id == f.id %}
+                        selected
+                    {% endif %}
+                >
+                    {{ f.name }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- الحقول -->
+
+        {% for c in cols %}
+
+        <div class="col-md-6">
+
+            <label class="form-label">
+
+                {{ field_labels.get(c, c) }}
+
+                {% if c == "name" %}
+
+                    <span class="text-danger">*</span>
+
+                {% endif %}
+
+            </label>
+
+
+            {% if c in ["status"] %}
+
+            <select
+                name="{{ c }}"
+                class="form-select"
+            >
+
+                <option value="">
+                    -- اختر الحالة --
+                </option>
+
+                <option
+                    value="نشط"
+                    {% if obj and getattr(obj,c,"") == "نشط" %}
+                        selected
+                    {% endif %}
+                >
+                    نشط
+                </option>
+
+                <option
+                    value="غير نشط"
+                    {% if obj and getattr(obj,c,"") == "غير نشط" %}
+                        selected
+                    {% endif %}
+                >
+                    غير نشط
+                </option>
+
+                <option
+                    value="موقوف"
+                    {% if obj and getattr(obj,c,"") == "موقوف" %}
+                        selected
+                    {% endif %}
+                >
+                    موقوف
+                </option>
+
+            </select>
+
+
+            {% elif c in ["expiry", "established_date"] %}
+
+            <input
+                type="date"
+                name="{{ c }}"
+                class="form-control"
+                value="{% if obj and getattr(obj,c,None) %}{{ getattr(obj,c).strftime('%Y-%m-%d') }}{% endif %}"
+            >
+
+
+            {% elif c in ["notes"] %}
+
+            <textarea
+                name="{{ c }}"
+                class="form-control"
+                rows="4"
+            >{% if obj %}{{ getattr(obj,c,"") or "" }}{% endif %}</textarea>
+
+
+            {% else %}
+
+            <input
+                type="text"
+                name="{{ c }}"
+                class="form-control"
+                value="{% if obj %}{{ getattr(obj,c,"") or "" }}{% endif %}"
+                {% if c == "name" %}required{% endif %}
+            >
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- الأزرار -->
+
+    <div class="mt-4 d-flex gap-2 flex-wrap">
+
+        <button
+            type="submit"
+            class="btn btn-success px-4"
+        >
+            💾 حفظ البيانات
+        </button>
+
+
+        <a
+            href="{{ url_for('data_list', kind=kind) }}"
+            class="btn btn-secondary px-4"
+        >
+            ↩️ إلغاء
+        </a>
+
+    </div>
+
+</form>
+
+{% endblock %}
