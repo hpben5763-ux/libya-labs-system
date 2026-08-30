@@ -646,6 +646,10 @@ def create_app():
     # إضافة
     # =========================
 
+ # =========================
+    # إضافة سجل جديد
+    # =========================
+
     @app.route(
         "/new/<kind>",
         methods=["GET", "POST"]
@@ -664,6 +668,12 @@ def create_app():
 
         model, label, cols = configs[kind]
 
+        # المرفق الذي جاء منه المستخدم
+        preselected_facility = request.args.get(
+            "facility_id",
+            type=int
+        )
+
         if request.method == "POST":
 
             obj = model()
@@ -673,10 +683,12 @@ def create_app():
                 cols
             )
 
+            # جميع الأقسام ما عدا المرافق مرتبطة بمرفق
             if kind != "facilities":
 
                 facility_id = request.form.get(
-                    "facility_id"
+                    "facility_id",
+                    type=int
                 )
 
                 if not facility_id:
@@ -693,9 +705,26 @@ def create_app():
                         )
                     )
 
-                obj.facility_id = int(
+                # التأكد أن المرفق موجود
+                facility = Facility.query.get(
                     facility_id
                 )
+
+                if not facility:
+
+                    flash(
+                        "المرفق المحدد غير موجود",
+                        "danger"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "new",
+                            kind=kind
+                        )
+                    )
+
+                obj.facility_id = facility_id
 
             db.session.add(obj)
 
@@ -705,6 +734,20 @@ def create_app():
                 "تم الحفظ بنجاح",
                 "success"
             )
+
+            # إذا تمت الإضافة من داخل ملف المرفق
+            # نرجع مباشرة إلى ملف المرفق
+            if (
+                kind != "facilities"
+                and preselected_facility
+            ):
+
+                return redirect(
+                    url_for(
+                        "facility",
+                        fid=preselected_facility
+                    )
+                )
 
             return redirect(
                 url_for(
@@ -721,6 +764,9 @@ def create_app():
             label=label,
             cols=cols,
             obj=None,
+
+            preselected_facility=
+                preselected_facility,
 
             facilities=
                 Facility.query.order_by(
