@@ -129,7 +129,12 @@
             🩸 مصارف الدم
         </a>
 
-
+<a
+    class="btn btn-outline-info"
+    href="{{ url_for('reports') }}"
+>
+    📑 التقارير
+</a>
         {% if session.get('role') == 'admin' %}
 
         <a
