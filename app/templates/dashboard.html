@@ -1,1 +1,161 @@
-{% extends "base.html" %}{% block body %}<h1 class="mb-4">لوحة التحكم</h1><div class="row g-3">{% for k,l in [('facilities','🏥 المرافق'),('staff','👨‍⚕️ العاملين'),('devices','🖥️ الأجهزة'),('reagents','🧪 الكواشف'),('blood_banks','🩸 مصارف الدم')] %}<div class="col-6 col-lg"><a class="card shadow-sm p-3 text-decoration-none text-dark h-100" href="{{url_for('data_list',kind=k)}}"><div class="stat">{{counts[k]}}</div><div>{{l}}</div></a></div>{% endfor %}</div>{% if exp_count %}<div class="alert alert-warning mt-4">⚠️ يوجد {{exp_count}} من الكواشف تنتهي خلال 60 يومًا أو أقل.</div>{% endif %}<div class="card shadow-sm p-4 mt-4"><h4>جاهزية المنظومة</h4><p class="muted mb-0">هذه نسخة مركزية قابلة للنشر على استضافة مع قاعدة بيانات PostgreSQL، وتعمل من الهاتف والكمبيوتر.</p></div>{% endblock %}
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
+    <div>
+        <h1 class="mb-1">📊 لوحة التحكم</h1>
+        <p class="text-muted mb-0">
+            نظرة عامة على بيانات منظومة المختبرات الطبية ومصارف الدم
+        </p>
+    </div>
+
+</div>
+
+
+<!-- الإحصائيات -->
+
+<div class="row g-3">
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <a
+            href="{{ url_for('data_list', kind='facilities') }}"
+            class="card shadow-sm p-3 text-decoration-none text-dark h-100"
+        >
+            <div class="stat">
+                {{ counts.facilities }}
+            </div>
+
+            <div>
+                🏢 المرافق
+            </div>
+        </a>
+    </div>
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <a
+            href="{{ url_for('data_list', kind='laboratories') }}"
+            class="card shadow-sm p-3 text-decoration-none text-dark h-100"
+        >
+            <div class="stat">
+                {{ counts.laboratories }}
+            </div>
+
+            <div>
+                🧪 المختبرات
+            </div>
+        </a>
+    </div>
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <a
+            href="{{ url_for('data_list', kind='staff') }}"
+            class="card shadow-sm p-3 text-decoration-none text-dark h-100"
+        >
+            <div class="stat">
+                {{ counts.staff }}
+            </div>
+
+            <div>
+                👨‍⚕️ العاملين
+            </div>
+        </a>
+    </div>
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <a
+            href="{{ url_for('data_list', kind='devices') }}"
+            class="card shadow-sm p-3 text-decoration-none text-dark h-100"
+        >
+            <div class="stat">
+                {{ counts.devices }}
+            </div>
+
+            <div>
+                ⚙️ الأجهزة
+            </div>
+        </a>
+    </div>
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <a
+            href="{{ url_for('data_list', kind='reagents') }}"
+            class="card shadow-sm p-3 text-decoration-none text-dark h-100"
+        >
+            <div class="stat">
+                {{ counts.reagents }}
+            </div>
+
+            <div>
+                🧴 الكواشف
+            </div>
+        </a>
+    </div>
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <a
+            href="{{ url_for('data_list', kind='blood_banks') }}"
+            class="card shadow-sm p-3 text-decoration-none text-dark h-100"
+        >
+            <div class="stat">
+                {{ counts.blood_banks }}
+            </div>
+
+            <div>
+                🩸 مصارف الدم
+            </div>
+        </a>
+    </div>
+
+</div>
+
+
+<!-- تنبيه الكواشف -->
+
+{% if exp_count %}
+
+<div class="alert alert-warning mt-4 shadow-sm">
+
+    <strong>⚠️ تنبيه:</strong>
+
+    يوجد
+    <strong>{{ exp_count }}</strong>
+    من الكواشف تنتهي صلاحيتها خلال
+    <strong>60 يومًا أو أقل</strong>.
+
+    <a
+        href="{{ url_for('data_list', kind='reagents') }}"
+        class="alert-link"
+    >
+        عرض الكواشف
+    </a>
+
+</div>
+
+{% endif %}
+
+
+<!-- معلومات النظام -->
+
+<div class="card shadow-sm p-4 mt-4">
+
+    <h4 class="mb-3">
+        🏥 منظومة المختبرات الطبية
+    </h4>
+
+    <p class="text-muted mb-0">
+        منظومة مركزية لحصر وإدارة بيانات المرافق والمختبرات
+        الطبية والعاملين والأجهزة والكواشف ومصارف الدم.
+    </p>
+
+</div>
+
+
+{% endblock %}
