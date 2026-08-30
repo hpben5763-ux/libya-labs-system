@@ -194,11 +194,11 @@
         {% if session.get('role') in ['admin', 'editor'] %}
 
         <a
-            href="{{ url_for('new', kind='laboratories') }}"
-            class="btn btn-sm btn-success"
-        >
-            ➕ إضافة مختبر
-        </a>
+    href="{{ url_for('new', kind='laboratories', facility_id=f.id) }}"
+    class="btn btn-sm btn-success"
+>
+    ➕ إضافة مختبر
+</a>
 
         {% endif %}
 
