@@ -1,1 +1,559 @@
-{% extends "base.html" %}{% block body %}<div class="d-flex justify-content-between align-items-center mb-3"><h1>📂 {{f.name}}</h1><a class="btn btn-primary" href="{{url_for('edit',kind='facilities',rid=f.id)}}">✏️ تعديل</a></div><div class="row g-3">{% for label,val in [('النوع',f.facility_type),('المنطقة',f.region),('البلدية',f.municipality),('المدينة',f.city),('الهاتف',f.phone),('المدير',f.manager),('الحالة',f.status),('العنوان',f.address)] %}<div class="col-6 col-lg-3"><div class="card p-3 shadow-sm"><small class="text-muted">{{label}}</small><b>{{val or '-'}}</b></div></div>{% endfor %}</div><div class="row g-3 mt-2">{% for label,count,kind in [('👨‍⚕️ العاملين',staff|length,'staff'),('🖥️ الأجهزة',devices|length,'devices'),('🧪 الكواشف',reagents|length,'reagents'),('🩸 مصارف الدم',blood_banks|length,'blood_banks')] %}<div class="col-6 col-lg-3"><div class="card p-3 shadow-sm"><h5>{{label}}</h5><div class="stat">{{count}}</div><a href="{{url_for('data_list',kind=kind)}}">عرض الكل</a></div></div>{% endfor %}</div>{% endblock %}
+{% extends "base.html" %}
+
+{% block body %}
+
+<!-- رأس الصفحة -->
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
+    <div>
+        <h1 class="mb-1">📂 {{ f.name }}</h1>
+        <p class="text-muted mb-0">
+            الملف التفصيلي للمرفق
+        </p>
+    </div>
+
+    <div class="d-flex gap-2">
+
+        {% if session.get('role') in ['admin', 'editor'] %}
+
+        <a
+            class="btn btn-primary"
+            href="{{ url_for('edit', kind='facilities', rid=f.id) }}"
+        >
+            ✏️ تعديل المرفق
+        </a>
+
+        {% endif %}
+
+        <a
+            class="btn btn-secondary"
+            href="{{ url_for('data_list', kind='facilities') }}"
+        >
+            ↩️ رجوع
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- معلومات المرفق -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">🏢 بيانات المرفق</h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            {% for label, val in [
+
+                ('اسم المرفق', f.name),
+                ('نوع المرفق', f.facility_type),
+                ('المنطقة', f.region),
+                ('البلدية', f.municipality),
+                ('المدينة', f.city),
+                ('الهاتف', f.phone),
+                ('المدير / المسؤول', f.manager),
+                ('الحالة', f.status),
+                ('العنوان', f.address)
+
+            ] %}
+
+            <div class="col-6 col-md-4 col-lg-3">
+
+                <div class="card h-100 p-3 shadow-sm">
+
+                    <small class="text-muted">
+                        {{ label }}
+                    </small>
+
+                    <strong>
+                        {{ val or '-' }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- الإحصائيات -->
+
+<div class="row g-3 mb-4">
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+
+        <div class="card shadow-sm p-3 h-100">
+
+            <div class="text-muted">
+                🧪 المختبرات
+            </div>
+
+            <div class="stat">
+                {{ laboratories|length }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+
+        <div class="card shadow-sm p-3 h-100">
+
+            <div class="text-muted">
+                👨‍⚕️ العاملين
+            </div>
+
+            <div class="stat">
+                {{ staff|length }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+
+        <div class="card shadow-sm p-3 h-100">
+
+            <div class="text-muted">
+                ⚙️ الأجهزة
+            </div>
+
+            <div class="stat">
+                {{ devices|length }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+
+        <div class="card shadow-sm p-3 h-100">
+
+            <div class="text-muted">
+                🧴 الكواشف
+            </div>
+
+            <div class="stat">
+                {{ reagents|length }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-6 col-md-4 col-lg-2">
+
+        <div class="card shadow-sm p-3 h-100">
+
+            <div class="text-muted">
+                🩸 مصارف الدم
+            </div>
+
+            <div class="stat">
+                {{ blood_banks|length }}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- المختبرات -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h5 class="mb-0">
+            🧪 المختبرات التابعة للمرفق
+        </h5>
+
+        {% if session.get('role') in ['admin', 'editor'] %}
+
+        <a
+            href="{{ url_for('new', kind='laboratories') }}"
+            class="btn btn-sm btn-success"
+        >
+            ➕ إضافة مختبر
+        </a>
+
+        {% endif %}
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle mb-0">
+
+            <thead>
+
+                <tr>
+                    <th>#</th>
+                    <th>اسم المختبر</th>
+                    <th>النوع</th>
+                    <th>المستوى</th>
+                    <th>المدينة</th>
+                    <th>المسؤول</th>
+                    <th>الحالة</th>
+                    <th>إجراء</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for item in laboratories %}
+
+                <tr>
+
+                    <td>{{ loop.index }}</td>
+
+                    <td>{{ item.name }}</td>
+
+                    <td>{{ item.laboratory_type or '-' }}</td>
+
+                    <td>{{ item.level or '-' }}</td>
+
+                    <td>{{ item.city or '-' }}</td>
+
+                    <td>{{ item.manager or '-' }}</td>
+
+                    <td>{{ item.status or '-' }}</td>
+
+                    <td>
+
+                        {% if session.get('role') in ['admin', 'editor'] %}
+
+                        <a
+                            href="{{ url_for('edit', kind='laboratories', rid=item.id) }}"
+                            class="btn btn-sm btn-outline-primary"
+                        >
+                            ✏️
+                        </a>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% else %}
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="text-center text-muted p-4"
+                    >
+                        لا توجد مختبرات مسجلة لهذا المرفق.
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- العاملين -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">
+            👨‍⚕️ العاملون
+        </h5>
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover mb-0">
+
+            <thead>
+
+                <tr>
+                    <th>#</th>
+                    <th>الاسم</th>
+                    <th>المسمى الوظيفي</th>
+                    <th>التخصص</th>
+                    <th>المؤهل</th>
+                    <th>الهاتف</th>
+                    <th>الحالة</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for item in staff %}
+
+                <tr>
+
+                    <td>{{ loop.index }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.job_title or '-' }}</td>
+                    <td>{{ item.specialty or '-' }}</td>
+                    <td>{{ item.qualification or '-' }}</td>
+                    <td>{{ item.phone or '-' }}</td>
+                    <td>{{ item.status or '-' }}</td>
+
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center text-muted p-4">
+                        لا يوجد عاملون مسجلون.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- الأجهزة -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">
+            ⚙️ الأجهزة
+        </h5>
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover mb-0">
+
+            <thead>
+
+                <tr>
+                    <th>#</th>
+                    <th>الجهاز</th>
+                    <th>الفئة</th>
+                    <th>الشركة</th>
+                    <th>الموديل</th>
+                    <th>الرقم التسلسلي</th>
+                    <th>الحالة</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for item in devices %}
+
+                <tr>
+
+                    <td>{{ loop.index }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.category or '-' }}</td>
+                    <td>{{ item.manufacturer or '-' }}</td>
+                    <td>{{ item.model or '-' }}</td>
+                    <td>{{ item.serial_no or '-' }}</td>
+                    <td>{{ item.status or '-' }}</td>
+
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center text-muted p-4">
+                        لا توجد أجهزة مسجلة.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- الكواشف -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">
+            🧴 الكواشف
+        </h5>
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover mb-0">
+
+            <thead>
+
+                <tr>
+                    <th>#</th>
+                    <th>الكاشف</th>
+                    <th>الشركة</th>
+                    <th>رقم التشغيلة</th>
+                    <th>تاريخ الانتهاء</th>
+                    <th>الكمية</th>
+                    <th>الحالة</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for item in reagents %}
+
+                <tr>
+
+                    <td>{{ loop.index }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.manufacturer or '-' }}</td>
+                    <td>{{ item.lot_no or '-' }}</td>
+
+                    <td>
+                        {% if item.expiry %}
+                            {{ item.expiry.strftime('%Y-%m-%d') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ item.quantity or '-' }}
+                        {{ item.unit or '' }}
+                    </td>
+
+                    <td>{{ item.status or '-' }}</td>
+
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center text-muted p-4">
+                        لا توجد كواشف مسجلة.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- مصارف الدم -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">
+            🩸 مصارف الدم
+        </h5>
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover mb-0">
+
+            <thead>
+
+                <tr>
+                    <th>#</th>
+                    <th>المصرف</th>
+                    <th>النوع</th>
+                    <th>السعة</th>
+                    <th>المسؤول</th>
+                    <th>الهاتف</th>
+                    <th>الحالة</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for item in blood_banks %}
+
+                <tr>
+
+                    <td>{{ loop.index }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.blood_bank_type or '-' }}</td>
+                    <td>{{ item.capacity or '-' }}</td>
+                    <td>{{ item.manager or '-' }}</td>
+                    <td>{{ item.phone or '-' }}</td>
+                    <td>{{ item.status or '-' }}</td>
+
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center text-muted p-4">
+                        لا توجد مصارف دم مسجلة.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
