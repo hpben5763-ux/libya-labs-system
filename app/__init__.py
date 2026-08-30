@@ -1052,7 +1052,45 @@ def create_app():
         return redirect(
             url_for("users")
         )
+# =========================
+    # التقارير
+    # =========================
 
+    @app.route("/reports")
+    @login_required
+    def reports():
+
+        counts = {
+            "facilities": Facility.query.count(),
+            "laboratories": Laboratory.query.count(),
+            "staff": Staff.query.count(),
+            "devices": Device.query.count(),
+            "reagents": Reagent.query.count(),
+            "blood_banks": BloodBank.query.count()
+        }
+
+        return render_template(
+            "reports.html",
+            counts=counts,
+            facilities=Facility.query.order_by(
+                Facility.name
+            ).all(),
+            laboratories=Laboratory.query.order_by(
+                Laboratory.name
+            ).all(),
+            staff=Staff.query.order_by(
+                Staff.name
+            ).all(),
+            devices=Device.query.order_by(
+                Device.name
+            ).all(),
+            reagents=Reagent.query.order_by(
+                Reagent.name
+            ).all(),
+            blood_banks=BloodBank.query.order_by(
+                BloodBank.name
+            ).all()
+        )
 
     # =========================
     # فحص النظام
