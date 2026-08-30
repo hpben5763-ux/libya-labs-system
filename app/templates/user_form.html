@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
+    <div>
+        <h1 class="mb-1">
+            {% if user %}
+                ✏️ تعديل مستخدم
+            {% else %}
+                ➕ إضافة مستخدم جديد
+            {% endif %}
+        </h1>
+
+        <p class="text-muted mb-0">
+            {{ "تعديل بيانات وصلاحيات المستخدم" if user else "إنشاء حساب جديد للمنظومة" }}
+        </p>
+    </div>
+
+    <a
+        href="{{ url_for('users') }}"
+        class="btn btn-secondary"
+    >
+        ↩️ رجوع
+    </a>
+
+</div>
+
+
+<form method="post" class="card shadow-sm p-4">
+
+    <div class="row g-4">
+
+
+        <!-- اسم المستخدم -->
+
+        <div class="col-md-6">
+
+            <label class="form-label">
+                اسم المستخدم
+                <span class="text-danger">*</span>
+            </label>
+
+            <input
+                type="text"
+                name="username"
+                class="form-control"
+                value="{{ user.username if user else '' }}"
+                placeholder="مثال: lab_user"
+                autocomplete="username"
+                required
+            >
+
+        </div>
+
+
+        <!-- كلمة المرور -->
+
+        <div class="col-md-6">
+
+            <label class="form-label">
+
+                كلمة المرور
+
+                {% if not user %}
+                    <span class="text-danger">*</span>
+                {% endif %}
+
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                class="form-control"
+                placeholder="{% if user %}اتركها فارغة إذا لا تريد تغييرها{% else %}أدخل كلمة المرور{% endif %}"
+                autocomplete="new-password"
+                {% if not user %}required{% endif %}
+            >
+
+            {% if user %}
+
+            <small class="text-muted">
+                اترك الحقل فارغًا للمحافظة على كلمة المرور الحالية.
+            </small>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- الصلاحية -->
+
+        <div class="col-md-6">
+
+            <label class="form-label">
+                صلاحية المستخدم
+                <span class="text-danger">*</span>
+            </label>
+
+            <select
+                name="role"
+                class="form-select"
+                required
+            >
+
+                <option
+                    value="admin"
+                    {% if user and user.role == "admin" %}selected{% endif %}
+                >
+                    🛡️ مدير النظام
+                </option>
+
+                <option
+                    value="editor"
+                    {% if not user or user.role == "editor" %}selected{% endif %}
+                >
+                    ✏️ مدخل بيانات
+                </option>
+
+                <option
+                    value="viewer"
+                    {% if user and user.role == "viewer" %}selected{% endif %}
+                >
+                    👁️ مشاهد
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <!-- شرح الصلاحيات -->
+
+    <div class="alert alert-light border mt-4">
+
+        <h6 class="mb-3">
+            🔐 توضيح الصلاحيات
+        </h6>
+
+        <ul class="mb-0">
+
+            <li class="mb-2">
+                <strong>مدير النظام:</strong>
+                إدارة كاملة للبيانات والمستخدمين والحذف.
+            </li>
+
+            <li class="mb-2">
+                <strong>مدخل بيانات:</strong>
+                إضافة وتعديل البيانات، بدون حذف أو إدارة المستخدمين.
+            </li>
+
+            <li>
+                <strong>مشاهد:</strong>
+                مشاهدة والبحث في البيانات فقط.
+            </li>
+
+        </ul>
+
+    </div>
+
+
+    <!-- الأزرار -->
+
+    <div class="mt-4 d-flex gap-2">
+
+        <button
+            type="submit"
+            class="btn btn-success px-4"
+        >
+            💾
+            {% if user %}
+                حفظ التعديلات
+            {% else %}
+                إنشاء المستخدم
+            {% endif %}
+        </button>
+
+
+        <a
+            href="{{ url_for('users') }}"
+            class="btn btn-secondary px-4"
+        >
+            إلغاء
+        </a>
+
+    </div>
+
+</form>
+
+{% endblock %}
