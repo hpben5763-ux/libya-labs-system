@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
+    <div>
+        <h1>📑 التقارير</h1>
+        <p class="text-muted mb-0">
+            تقارير وإحصائيات منظومة المختبرات الطبية ومصارف الدم
+        </p>
+    </div>
+
+    <button
+        onclick="window.print()"
+        class="btn btn-primary"
+    >
+        🖨️ طباعة التقرير
+    </button>
+
+</div>
+
+
+<!-- الإحصائيات -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card shadow-sm p-3 h-100">
+            <small class="text-muted">🏢 المرافق</small>
+            <div class="stat">{{ counts.facilities }}</div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card shadow-sm p-3 h-100">
+            <small class="text-muted">🧪 المختبرات</small>
+            <div class="stat">{{ counts.laboratories }}</div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card shadow-sm p-3 h-100">
+            <small class="text-muted">👨‍⚕️ العاملين</small>
+            <div class="stat">{{ counts.staff }}</div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card shadow-sm p-3 h-100">
+            <small class="text-muted">⚙️ الأجهزة</small>
+            <div class="stat">{{ counts.devices }}</div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card shadow-sm p-3 h-100">
+            <small class="text-muted">🧴 الكواشف</small>
+            <div class="stat">{{ counts.reagents }}</div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card shadow-sm p-3 h-100">
+            <small class="text-muted">🩸 مصارف الدم</small>
+            <div class="stat">{{ counts.blood_banks }}</div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- تقرير المرافق -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+        <h5 class="mb-0">
+            🏢 تقرير المرافق
+        </h5>
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle mb-0">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>المرفق</th>
+                    <th>النوع</th>
+                    <th>المنطقة</th>
+                    <th>البلدية</th>
+                    <th>المدينة</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for f in facilities %}
+
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ f.name }}</td>
+                    <td>{{ f.facility_type or '-' }}</td>
+                    <td>{{ f.region or '-' }}</td>
+                    <td>{{ f.municipality or '-' }}</td>
+                    <td>{{ f.city or '-' }}</td>
+                    <td>{{ f.status or '-' }}</td>
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center text-muted p-4">
+                        لا توجد مرافق مسجلة.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- تقرير المختبرات -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+        <h5 class="mb-0">
+            🧪 تقرير المختبرات
+        </h5>
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle mb-0">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>المختبر</th>
+                    <th>النوع</th>
+                    <th>المستوى</th>
+                    <th>البلدية</th>
+                    <th>المسؤول</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for lab in laboratories %}
+
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ lab.name }}</td>
+                    <td>{{ lab.laboratory_type or '-' }}</td>
+                    <td>{{ lab.level or '-' }}</td>
+                    <td>{{ lab.municipality or '-' }}</td>
+                    <td>{{ lab.manager or '-' }}</td>
+                    <td>{{ lab.status or '-' }}</td>
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center text-muted p-4">
+                        لا توجد مختبرات مسجلة.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- تقرير مصارف الدم -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+        <h5 class="mb-0">
+            🩸 تقرير مصارف الدم
+        </h5>
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle mb-0">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>المصرف</th>
+                    <th>النوع</th>
+                    <th>السعة</th>
+                    <th>المسؤول</th>
+                    <th>الهاتف</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for bank in blood_banks %}
+
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ bank.name }}</td>
+                    <td>{{ bank.blood_bank_type or '-' }}</td>
+                    <td>{{ bank.capacity or '-' }}</td>
+                    <td>{{ bank.manager or '-' }}</td>
+                    <td>{{ bank.phone or '-' }}</td>
+                    <td>{{ bank.status or '-' }}</td>
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center text-muted p-4">
+                        لا توجد مصارف دم مسجلة.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<div class="text-center text-muted mt-4">
+
+    <small>
+        منظومة المختبرات الطبية ومصارف الدم
+    </small>
+
+</div>
+
+
+{% endblock %}
